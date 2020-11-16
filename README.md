@@ -15,7 +15,7 @@ please wait.. 준비중..
 
 
 ## Wiring Diagram
-|**아두이노 Pin** | :**모듈 Pin**|
+|<center>**아두이노 Pin**</center> | <center>**모듈 Pin**</center>|
 |------- | -------:|
 A0 | 조이스틱 VRy
 A1 | 조이스틱 VRx
