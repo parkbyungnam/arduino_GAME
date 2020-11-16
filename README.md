@@ -14,8 +14,17 @@ please wait.. 준비중..
 * DM112 (피에조 수동 부저)
 
 
-## 회로도
-
+## Wiring Diagram
+아두이노 Pin | 모듈 Pin
+A0 | 조이스틱 VRy
+A1 | 조이스틱 VRx
+8 | 조이스틱 SW
+A4 | LCD SDA
+A5 | LCD SCL
+10 | 도트매트릭스 CS
+11 | 도트매트릭스 CLK
+12 | 도트매트릭스 DIN
+4 | 피에조 부저
 
 
 ## 
