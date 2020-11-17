@@ -26,4 +26,4 @@ A5 | LCD SCL
 11 | 도트매트릭스 CLK
 12 | 도트매트릭스 DIN
 4 | 피에조 부저
-
+<img src="https://user-images.githubusercontent.com/57394605/99402233-77caa080-292c-11eb-8f7d-446d3d3f8542.png" alt="drawing" width="600">
