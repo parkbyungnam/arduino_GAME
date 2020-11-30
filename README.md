@@ -1,7 +1,7 @@
 # arduino_GAME
 
 ## Overview
-please wait.. 준비중..
+<iframe width="906" height="516" src="https://www.youtube.com/embed/DtdoWHL9lCU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 ## Requirement
@@ -10,20 +10,20 @@ please wait.. 준비중..
 * KY-023 (조이스틱)
 * 점퍼 와이어
 * 브레드보드
-* I2C 1602 모듈 (LCD)
 * DM112 (피에조 수동 부저)
 
 
 ## Wiring Diagram
 | **<center>아두이노 Pin</center>** | **<center>모듈 Pin</center>** |
 |------- | -------:|
-A0 | 조이스틱 VRy
-A1 | 조이스틱 VRx
+A0 | 조이스틱 VRx
+A1 | 조이스틱 VRy
 8 | 조이스틱 SW
-A4 | LCD SDA
-A5 | LCD SCL
 10 | 도트매트릭스 CS
 11 | 도트매트릭스 CLK
 12 | 도트매트릭스 DIN
 4 | 피에조 부저
-<img src="https://user-images.githubusercontent.com/57394605/99402233-77caa080-292c-11eb-8f7d-446d3d3f8542.png" alt="drawing" width="600">
+<img src="https://user-images.githubusercontent.com/57394605/100580920-24901f00-332a-11eb-9afb-1318475519cb.png" alt="drawing" width="600">
+
+##Reference
+[ondt-arduino_snake](https://github.com/ondt/arduino-snake/)
