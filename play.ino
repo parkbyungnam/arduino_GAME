@@ -12,7 +12,7 @@
 
 
 #include "LedControl.h" // 도트 매트릭스 사용 시 라이브러리 사용 필요
-#include "pitches.h"
+#include "pitches.h" // 부저 라이브러리
 // 스네이크 게임 핀 정의
 struct Pin {
   static const short joystickX = A1;   // 조이스틱 X핀
@@ -37,11 +37,9 @@ const short initialSnakeLength = 3;
 unsigned long songMillis = 0; //딜레이 대용
 int thisNote = -1;
 short melodySpeed = 2000;
-short melodyNumber = 0; //0.No Melody 1.라스트카운트다운 2.마리오메인 3.마리오언더월드
+short melodyNumber = random(3)+1; //멜로디 1.라스트 카운트다운 2.마리오메인 3.마리오언더월드 4.게임오버
 
 void setup() {
-  Serial.begin(115200);
-  pinMode(4, OUTPUT);
   initialize();         // pins & LED matrix 초기화
   calibrateJoystick(); // 조이스틱 기본 위치 보정
   showSnakeMessage(); // 도트 매트릭스에 스네이크 게임 메시지 출력
@@ -49,7 +47,6 @@ void setup() {
 
 
 void loop() {
-  melodyWithoutDelay(melodyNumber,melodySpeed);
   generateFood();      // 먹이 없으면 먹이 1개 생성
   scanJoystick();     // 조이스틱 움직임 확인 & 먹이 깜빡이기
   calculateSnake();  // 뱀 객체 계산 (길이, 위치)
@@ -189,6 +186,27 @@ int underworld_tempo[] = {
   10, 10, 10
 };
 
+//게임 오버
+int gameover_melody[] = {
+  NOTE_C4, 0, NOTE_G3, 0, NOTE_E3, 0,
+  NOTE_A3, NOTE_B3, NOTE_A3,
+  0,
+  NOTE_GS3, NOTE_AS3, NOTE_GS3,
+  0,
+  NOTE_G3, NOTE_F3, NOTE_G3
+};
+
+
+int gameover_tempo[] = {
+  8, 10, 8, 10, 8, 10,
+  8, 10, 6,
+  10,
+  8, 10, 6,
+  10,
+  8, 10, 4
+};
+
+
 
 
 // --------------------------------------------------------------- //
@@ -264,10 +282,10 @@ void scanJoystick() {
   long timestamp = millis();
   while (millis() < timestamp + snakeSpeed) {
     // 뱀 속도 조절 가능
-
+    melodyWithoutDelay(melodyNumber,melodySpeed); // 게임 멜로디 출력
     // 조이스틱 방향이 어딘지 확인
-    analogRead(Pin::joystickY) < (joystickHome.y - joystickThreshold) ? snakeDirection = up    : 0;     //1
-    analogRead(Pin::joystickY) > (joystickHome.y + joystickThreshold) ? snakeDirection = down  : 0;    //3
+    analogRead(Pin::joystickY) < (joystickHome.y - joystickThreshold) ? snakeDirection = down    : 0;   //3
+    analogRead(Pin::joystickY) > (joystickHome.y + joystickThreshold) ? snakeDirection = up  : 0;      //1
     analogRead(Pin::joystickX) < (joystickHome.x - joystickThreshold) ? snakeDirection = left  : 0;   //4
     analogRead(Pin::joystickX) > (joystickHome.x + joystickThreshold) ? snakeDirection = right : 0;  //2
 
@@ -315,6 +333,7 @@ void calculateSnake() {
   // 뱀 몸에 부딪히면
   if (gameboard[snake.row][snake.col] > 1 && snakeDirection != 0) {
     gameOver = true;
+    thisNote = -2;
     noTone(Pin::buzzer); // 게임 멜로디 정지
     return;
   }
@@ -369,10 +388,11 @@ void fixEdge() {
 void handleGameStates() {
   if (gameOver || win) {
     unrollSnake();
-
     showScoreMessage(snakeLength - initialSnakeLength);
 
-    if (gameOver) showGameOverMessage();
+    if (gameOver){
+      showGameOverMessage();    
+    }
     else if (win) showWinMessage();
 
     // 게임 다시 시작
@@ -465,7 +485,8 @@ void initialize() {
 // 멜로디재생 (0.No melody)(1.파이널카운트다운),(2.마리오 메인),(3.마리오 언더월드) 속도는 낮을수록 빠름(500~1200)
 void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
   unsigned long cMillis = millis();
-
+  short myNumber = melodyNumber;
+  
   //파이널카운트다운
   if (melodyNumber==1){
     int lengthOfSong = sizeof(finalCountdown_melody) / sizeof(int) ; 
@@ -488,6 +509,8 @@ void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
         songMillis = cMillis; //buzzer
     }
   }
+
+
 
   //마리오 메인
   else if (melodyNumber==2){
@@ -517,23 +540,50 @@ void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
       int lengthOfSong = sizeof(underworld_melody) / sizeof(int) ; 
       int noteDuration = melodySpeed / underworld_tempo[thisNote];
       int pauseBetweenNotes = noteDuration * 1.2;
+      
       if ((cMillis - songMillis <= pauseBetweenNotes / 4)) {
       //digitalWrite(led, LOW); //LED 사용시 넣기
       }
+      
       else if ((cMillis - songMillis <= pauseBetweenNotes)) {
           tone(Pin::buzzer, underworld_melody[thisNote], noteDuration);
       }
+      
       else {
           if (thisNote >= lengthOfSong) {
           thisNote = -2;
-          //melodyNumber = 0; //음악 한바퀴 돌면 종료
           }
           thisNote++;
           noTone(Pin::buzzer);
           songMillis = cMillis;
       }
   }
+  //게임오버 멜로디
+    else if (melodyNumber==4){
+    int lengthOfSong = sizeof(gameover_melody) / sizeof(int) ; 
+    int noteDuration = melodySpeed / gameover_tempo[thisNote];
+    int pauseBetweenNotes = noteDuration * 1.2;
+
+    if ((cMillis - songMillis <= pauseBetweenNotes / 4)) {
+        //digitalWrite(led, LOW); //LED 사용 시 넣기
+    }
+    else if ((cMillis - songMillis <= pauseBetweenNotes)) {
+        tone(Pin::buzzer, gameover_melody[thisNote], noteDuration);
+    }
+    else {
+        if (thisNote >= lengthOfSong) {
+        thisNote = -2;
+        //melodyNumber = random(3)+1; //게임 오버 후 3개 노래 중에 랜덤
+        }
+        thisNote++;
+        noTone(Pin::buzzer);
+        songMillis = cMillis; //buzzer
+    }
+  }
+
+  
 }
+
 
 
 
@@ -542,14 +592,14 @@ void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
 // --------------------------------------------------------------- //
 
 const PROGMEM bool snakeMessage[8][56] = {
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 const PROGMEM bool gameOverMessage[8][90] = {
@@ -694,7 +744,6 @@ void showSnakeMessage() {
               || analogRead(Pin::joystickY) > joystickHome.y + joystickThreshold
               || analogRead(Pin::joystickX) < joystickHome.x - joystickThreshold
               || analogRead(Pin::joystickX) > joystickHome.x + joystickThreshold) {
-		melodyNumber = 3; //멜로디 시작, 1.라스트 카운트다운 2.마리오메인 3.마리오언더월드
         return; // 람다 함수 반환
       }
     }
@@ -728,7 +777,6 @@ void showGameOverMessage() {
               || analogRead(Pin::joystickY) > joystickHome.y + joystickThreshold
               || analogRead(Pin::joystickX) < joystickHome.x - joystickThreshold
               || analogRead(Pin::joystickX) > joystickHome.x + joystickThreshold) {
-		//melodyFlag = true; //멜로디 시작
         return; // 람다 함수 반환
       }
     }
@@ -747,6 +795,7 @@ void showGameOverMessage() {
 
 // 'win' 메시지 도트 매트릭스에 출력
 void showWinMessage() {
+
     }
 
 
