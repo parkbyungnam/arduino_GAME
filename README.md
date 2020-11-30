@@ -1,7 +1,7 @@
 # arduino_GAME
 
 ## Overview
-<iframe width="906" height="516" src="https://www.youtube.com/embed/DtdoWHL9lCU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![미리보기](https://user-images.githubusercontent.com/57394605/100582014-e5fb6400-332b-11eb-915d-e2ef9488c292.png)](https://youtu.be/DtdoWHL9lCU)
 
 
 ## Requirement
