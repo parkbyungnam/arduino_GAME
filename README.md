@@ -1,7 +1,7 @@
 # arduino_GAME
 
 ## Overview
-[![미리보기](https://user-images.githubusercontent.com/57394605/100582014-e5fb6400-332b-11eb-915d-e2ef9488c292.png)](https://youtu.be/DtdoWHL9lCU)
+[![미리보기](https://user-images.githubusercontent.com/57394605/100582014-e5fb6400-332b-11eb-915d-e2ef9488c292.png)](https://youtu.be/yYpOq0Xfrhs)
 
 
 ## Requirement
