@@ -6,7 +6,7 @@
 
 ## Requirement
 * 아두이노 우노
-* MAX7219 (8x8 도트 매트릭스)
+* MAX7219 Dot Matrix Module
 * KY-023 (조이스틱)
 * 점퍼 와이어
 * 브레드보드
