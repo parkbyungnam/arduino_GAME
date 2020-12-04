@@ -48,7 +48,7 @@ void setup() {
 
 void loop() {
   generateFood();      // 먹이 없으면 먹이 1개 생성
-  scanJoystick();     // 조이스틱 움직임 확인 & 먹이 깜빡이기
+  scanJoystick();     // 조이스틱 움직임 확인 & 먹이 깜빡이기 & 멜로디 출력
   calculateSnake();  // 뱀 객체 계산 (길이, 위치)
   handleGameStates();
 }
