@@ -493,16 +493,12 @@ void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
     int noteDuration = melodySpeed / finalCountdown_tempo[thisNote];
     int pauseBetweenNotes = noteDuration * 1.2;
 
-    if ((cMillis - songMillis <= pauseBetweenNotes / 4)) {
-        //digitalWrite(led, LOW); //LED 사용 시 넣기
-    }
-    else if ((cMillis - songMillis <= pauseBetweenNotes)) {
+    if ((cMillis - songMillis <= pauseBetweenNotes)) {
         tone(Pin::buzzer, finalCountdown_melody[thisNote], noteDuration);
     }
     else {
         if (thisNote >= lengthOfSong) {
         thisNote = -2;
-        //melodyNumber = 0; //음악 한바퀴 돌면 종료
         }
         thisNote++;
         noTone(Pin::buzzer);
@@ -518,16 +514,12 @@ void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
     int noteDuration = melodySpeed / mario_tempo[thisNote];
     int pauseBetweenNotes = noteDuration * 1.2;
 
-    if ((cMillis - songMillis <= pauseBetweenNotes / 4)) {
-        //digitalWrite(led, LOW); //LED 사용시 넣기
-    }
-    else if ((cMillis - songMillis <= pauseBetweenNotes)) {
+    if ((cMillis - songMillis <= pauseBetweenNotes)) {
         tone(Pin::buzzer, mario_melody[thisNote], noteDuration);
     }
     else {
         if (thisNote >= lengthOfSong) {
         thisNote = -2;
-        //melodyNumber = 0; //음악 한바퀴 돌면 종료
         }
         thisNote++;
         noTone(Pin::buzzer);
@@ -541,11 +533,7 @@ void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
       int noteDuration = melodySpeed / underworld_tempo[thisNote];
       int pauseBetweenNotes = noteDuration * 1.2;
       
-      if ((cMillis - songMillis <= pauseBetweenNotes / 4)) {
-      //digitalWrite(led, LOW); //LED 사용시 넣기
-      }
-      
-      else if ((cMillis - songMillis <= pauseBetweenNotes)) {
+      if ((cMillis - songMillis <= pauseBetweenNotes)) {
           tone(Pin::buzzer, underworld_melody[thisNote], noteDuration);
       }
       
@@ -564,10 +552,7 @@ void melodyWithoutDelay(short melodyNumber,short melodySpeed) {
     int noteDuration = melodySpeed / gameover_tempo[thisNote];
     int pauseBetweenNotes = noteDuration * 1.2;
 
-    if ((cMillis - songMillis <= pauseBetweenNotes / 4)) {
-        //digitalWrite(led, LOW); //LED 사용 시 넣기
-    }
-    else if ((cMillis - songMillis <= pauseBetweenNotes)) {
+    if ((cMillis - songMillis <= pauseBetweenNotes)) {
         tone(Pin::buzzer, gameover_melody[thisNote], noteDuration);
     }
     else {
